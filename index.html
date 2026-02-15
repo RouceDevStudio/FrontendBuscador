@@ -548,16 +548,20 @@
 
     <script>
         // ==================== CONFIGURACIÓN ====================
-        // SELF_PING_URL es la URL base del backend — definida aquí como variable
-        const SELF_PING_URL = 'https://backendbuscador.onrender.com';
+        // La URL del backend se lee desde el meta tag inyectado por el servidor,
+        // con fallback a origen relativo (cuando frontend y backend están en el mismo dominio).
+        const _backendMeta = document.querySelector('meta[name="backend-url"]');
+        const BACKEND_URL = (_backendMeta && _backendMeta.content && _backendMeta.content !== 'undefined')
+            ? _backendMeta.content.replace(/\/$/, '')
+            : '';   // string vacío → fetch usará rutas relativas (/api/search)
 
         const CONFIG = {
             WORKERS_COUNT: 8,
             RESULTS_PER_PAGE: 100,
             MIN_TITLE_LENGTH: 5,
             MAX_TITLE_LENGTH: 200,
-            // URL base del backend leída desde la variable SELF_PING_URL
-            BACKEND_URL: SELF_PING_URL
+            // URL base del backend leída desde el meta tag (inyectado por Express desde .env)
+            BACKEND_URL: BACKEND_URL
         };
 
         // ==================== ESTADO GLOBAL ====================
@@ -699,7 +703,7 @@
                         <h3>No se pudo conectar con el backend</h3>
                         <p>${escapeHtml(error.message)}</p>
                         <p style="margin-top:10px; font-size:0.85em; color:#888;">
-                            Backend: ${CONFIG.BACKEND_URL}
+                            ${CONFIG.BACKEND_URL ? 'Backend: ' + CONFIG.BACKEND_URL : 'Verifica que el servidor esté corriendo'}
                         </p>
                     </div>
                 `;
