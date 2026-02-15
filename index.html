@@ -552,7 +552,8 @@
             WORKERS_COUNT: 8,
             RESULTS_PER_PAGE: 100,
             MIN_TITLE_LENGTH: 5,
-            MAX_TITLE_LENGTH: 200
+            MAX_TITLE_LENGTH: 200,
+            BACKEND_URL: 'https://backendbuscador.onrender.com'
         };
 
         // ==================== ESTADO GLOBAL ====================
@@ -652,7 +653,7 @@
             setAllWorkersActive();
 
             try {
-                const response = await fetch('/api/search', {
+                const response = await fetch(`${CONFIG.BACKEND_URL}/api/search`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ keyword: keyword.trim(), filter })
