@@ -548,20 +548,11 @@
 
     <script>
         // ==================== CONFIGURACIÓN ====================
-        // La URL del backend se lee desde el meta tag inyectado por el servidor,
-        // con fallback a origen relativo (cuando frontend y backend están en el mismo dominio).
-        const _backendMeta = document.querySelector('meta[name="backend-url"]');
-        const BACKEND_URL = (_backendMeta && _backendMeta.content && _backendMeta.content !== 'undefined')
-            ? _backendMeta.content.replace(/\/$/, '')
-            : '';   // string vacío → fetch usará rutas relativas (/api/search)
-
         const CONFIG = {
             WORKERS_COUNT: 8,
             RESULTS_PER_PAGE: 100,
             MIN_TITLE_LENGTH: 5,
-            MAX_TITLE_LENGTH: 200,
-            // URL base del backend leída desde el meta tag (inyectado por Express desde .env)
-            BACKEND_URL: BACKEND_URL
+            MAX_TITLE_LENGTH: 200
         };
 
         // ==================== ESTADO GLOBAL ====================
@@ -661,18 +652,28 @@
             setAllWorkersActive();
 
             try {
-                const response = await fetch(`${CONFIG.BACKEND_URL}/api/search`, {
+                const response = await fetch('/api/search', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ keyword: keyword.trim(), filter })
                 });
 
-                if (!response.ok) {
-                    const errData = await response.json().catch(() => ({}));
-                    throw new Error(errData.error || `Error del servidor: ${response.status}`);
+                // Leer como texto primero para evitar crash si el servidor devuelve HTML
+                const rawText = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(rawText);
+                } catch (e) {
+                    const preview = rawText.substring(0, 120).replace(/</g, '&lt;');
+                    throw new Error(
+                        `El servidor no devolvió JSON válido (status ${response.status}). ` +
+                        `Respuesta: ${preview}`
+                    );
                 }
 
-                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || `Error del servidor: ${response.status}`);
+                }
 
                 if (!data.success) {
                     throw new Error(data.error || 'El servidor devolvió un error');
@@ -703,7 +704,7 @@
                         <h3>No se pudo conectar con el backend</h3>
                         <p>${escapeHtml(error.message)}</p>
                         <p style="margin-top:10px; font-size:0.85em; color:#888;">
-                            ${CONFIG.BACKEND_URL ? 'Backend: ' + CONFIG.BACKEND_URL : 'Verifica que el servidor esté corriendo'}
+                            Verifica que el servidor esté corriendo
                         </p>
                     </div>
                 `;
