@@ -479,13 +479,13 @@
     <div class="container">
         <div class="header">
             <h1>🔍 Buscador Avanzado Multi-Worker</h1>
-            <p>Búsqueda inteligente con 8 workers paralelos y filtrado automático</p>
+            <p>Búsqueda inteligente con 12 workers especializados: DuckDuckGo · Bing · Wikipedia · YouTube · GitHub · Reddit · StackOverflow · HackerNews · Archive.org · OpenLibrary</p>
         </div>
 
         <div class="search-section">
             <div class="input-group">
                 <label for="keyword">🎯 Palabra Clave</label>
-                <input type="text" id="keyword" placeholder="Ingresa tu palabra clave (ej: arroz, python, tutorial)">
+                <input type="text" id="keyword" placeholder="Ingresa tu búsqueda (ej: machine learning, receta arroz, nodejs tutorial)">
             </div>
 
             <div class="input-group">
@@ -549,7 +549,7 @@
     <script>
         // ==================== CONFIGURACIÓN ====================
         const CONFIG = {
-            WORKERS_COUNT: 8,
+            WORKERS_COUNT: 12,
             RESULTS_PER_PAGE: 100,
             MIN_TITLE_LENGTH: 5,
             MAX_TITLE_LENGTH: 200,
