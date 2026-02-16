@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscador v5.0 — Motor de Descarga</title>
+    <title>Buscador Avanzado v4.0</title>
     <style>
         * {
             margin: 0;
@@ -483,7 +483,7 @@
     <div class="container">
         <div class="header">
             <h1>🔍 Buscador Avanzado v4.0</h1>
-            <p>20 workers · Encuentra todo: PDFs, videos, código, archivos · MediaFire · Google Drive · MEGA · Archive.org · Gutenberg · arXiv · PDFDrive + más</p>
+            <p>20 workers · 17 fuentes · DDG · Bing · Wikipedia · YouTube · GitHub · GitLab · Reddit · StackOverflow · HackerNews · arXiv · Books · npm · DEV.to · Archive · Quora · Vimeo</p>
         </div>
 
         <div class="search-section">
@@ -593,12 +593,12 @@
 
         // ==================== WORKERS (UI) ====================
         const WORKER_NAMES = [
-            '🦆 DuckDuckGo p1','🦆 DuckDuckGo p2','📄 DDG PDFs','⬇️ DDG Descarga',
-            '🔷 Bing p1','🔷 Bing p2','🔷 Bing Descarga',
+            '🦆 DuckDuckGo p1','🦆 DuckDuckGo p2','🦆 DDG exacto','🦆 DDG descarga',
+            '🔷 Bing p1','🔷 Bing p2','🔷 Bing p3',
             '📖 Wikipedia','▶️ YouTube','🐙 GitHub',
             '🤖 Reddit','❓ StackOverflow','🔥 HackerNews',
-            '🗄️ Archive.org','📚 Libros','📗 Gutenberg',
-            '📊 arXiv','📄 PDFDrive','📑 SlideShare','📜 Scribd'
+            '📚 Books','🗄️ Archive.org','📝 DEV.to',
+            '📦 npm','📊 arXiv','🗣️ Quora','🎬 Vimeo'
         ];
 
         function initializeWorkers() {
@@ -831,10 +831,9 @@
 
             card.style.borderLeftColor = color;
             card.innerHTML = `
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
                     <span class="result-source" style="background:${color}">${icon} ${escapeHtml(src)}</span>
-                    ${result.isDownload ? '<span style="background:#28a745;color:white;padding:3px 8px;border-radius:10px;font-size:0.7em;font-weight:700">⬇️ DESCARGA</span>' : ''}
-                    <span style="font-size:0.75em;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px">${escapeHtml(domain)}</span>
+                    <span style="font-size:0.75em;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">${escapeHtml(domain)}</span>
                 </div>
                 <h3 class="result-title">${escapeHtml(result.title)}</h3>
                 <p class="result-description">${escapeHtml(result.description || '')}</p>
