@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscador Avanzado v3.0 - 18 Workers</title>
+    <title>Buscador Avanzado v4.0</title>
     <style>
         * {
             margin: 0;
@@ -144,8 +144,9 @@
 
         .worker-indicator {
             flex: 1;
-            min-width: 120px;
-            padding: 15px;
+            min-width: 100px;
+            max-width: 160px;
+            padding: 10px 12px;
             background: #f8f9fa;
             border-radius: 8px;
             text-align: center;
@@ -167,8 +168,11 @@
         .worker-indicator .worker-name {
             font-weight: 600;
             color: #495057;
-            font-size: 0.85em;
-            margin-bottom: 5px;
+            font-size: 0.78em;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .worker-indicator .worker-status {
@@ -478,14 +482,14 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔍 Buscador Avanzado Multi-Worker</h1>
-            <p>Búsqueda inteligente con 18 workers paralelos: DDG×4 · Bing×3 · Wikipedia · YouTube · GitHub · Reddit · StackOverflow · HackerNews · Archive.org · Books · DEV.to · npm</p>
+            <h1>🔍 Buscador Avanzado v4.0</h1>
+            <p>20 workers · 17 fuentes · DDG · Bing · Wikipedia · YouTube · GitHub · GitLab · Reddit · StackOverflow · HackerNews · arXiv · Books · npm · DEV.to · Archive · Quora · Vimeo</p>
         </div>
 
         <div class="search-section">
             <div class="input-group">
                 <label for="keyword">🎯 Palabra Clave</label>
-                <input type="text" id="keyword" placeholder="Ingresa tu búsqueda (ej: machine learning, receta arroz, nodejs tutorial)">
+                <input type="text" id="keyword" placeholder="Ingresa tu palabra clave (ej: arroz, python, tutorial)">
             </div>
 
             <div class="input-group">
@@ -535,6 +539,19 @@
                     <button class="sort-button" data-sort="source">Por Fuente</button>
                 </div>
             </div>
+            <div id="postSearchFilters" style="display:none;padding:15px 0;display:none;">
+                <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                    <span style="font-weight:600;color:#495057">🎯 Filtrar resultados:</span>
+                    <input type="text" id="resultFilter" placeholder="Buscar dentro de los resultados..." 
+                        style="flex:1;min-width:200px;padding:8px 14px;border:2px solid #dee2e6;border-radius:8px;font-size:14px"
+                        oninput="filterResultsInline(this.value)">
+                    <select id="sourceFilter" onchange="filterBySource(this.value)"
+                        style="padding:8px 14px;border:2px solid #dee2e6;border-radius:8px;font-size:14px;background:white">
+                        <option value="">Todas las fuentes</option>
+                    </select>
+                    <span id="resultCount" style="font-size:0.85em;color:#6c757d;white-space:nowrap"></span>
+                </div>
+            </div>
             <div id="resultsContainer"></div>
         </div>
     </div>
@@ -549,7 +566,7 @@
     <script>
         // ==================== CONFIGURACIÓN ====================
         const CONFIG = {
-            WORKERS_COUNT: 18,
+            WORKERS_COUNT: 20,
             RESULTS_PER_PAGE: 100,
             MIN_TITLE_LENGTH: 5,
             MAX_TITLE_LENGTH: 200,
@@ -575,20 +592,30 @@
         });
 
         // ==================== WORKERS (UI) ====================
+        const WORKER_NAMES = [
+            '🦆 DuckDuckGo p1','🦆 DuckDuckGo p2','🦆 DDG exacto','🦆 DDG descarga',
+            '🔷 Bing p1','🔷 Bing p2','🔷 Bing p3',
+            '📖 Wikipedia','▶️ YouTube','🐙 GitHub',
+            '🤖 Reddit','❓ StackOverflow','🔥 HackerNews',
+            '📚 Books','🗄️ Archive.org','📝 DEV.to',
+            '📦 npm','📊 arXiv','🗣️ Quora','🎬 Vimeo'
+        ];
+
         function initializeWorkers() {
             const workersContainer = document.getElementById('workersStatus');
             workersContainer.innerHTML = '';
             state.workers = [];
 
             for (let i = 0; i < CONFIG.WORKERS_COUNT; i++) {
-                const worker = { id: i + 1, name: `Worker #${i + 1}`, status: 'idle', resultsFound: 0 };
+                const name = WORKER_NAMES[i] || `Worker #${i + 1}`;
+                const worker = { id: i + 1, name, status: 'idle', resultsFound: 0 };
                 state.workers.push(worker);
 
                 const workerEl = document.createElement('div');
                 workerEl.className = 'worker-indicator';
                 workerEl.id = `worker-${worker.id}`;
                 workerEl.innerHTML = `
-                    <div class="worker-name">${worker.name}</div>
+                    <div class="worker-name">${name}</div>
                     <div class="worker-status">Inactivo</div>
                 `;
                 workersContainer.appendChild(workerEl);
@@ -616,11 +643,12 @@
 
                 const workerEl = document.getElementById(`worker-${workerId}`);
                 if (workerEl) {
-                    const statusText = status === 'active'    ? 'Buscando...' :
-                                       status === 'completed' ? `${resultsFound} encontrados` :
-                                                                'Inactivo';
+                    const statusText = status === 'active'    ? '⏳ Buscando...' :
+                                       status === 'completed' ? `✅ ${resultsFound}` :
+                                                                '⬜ Inactivo';
                     workerEl.querySelector('.worker-status').textContent = statusText;
                     workerEl.classList.toggle('active', status === 'active');
+                    workerEl.style.borderLeftColor = status==='completed' ? '#28a745' : status==='active' ? '#667eea' : '#dee2e6';
                 }
             }
             updateActiveWorkersCount();
@@ -642,6 +670,8 @@
             document.getElementById('searchBtn').disabled = true;
             document.getElementById('statsBar').style.display = 'flex';
             document.getElementById('resultsHeader').style.display = 'none';
+            const psf = document.getElementById('postSearchFilters');
+            if (psf) psf.style.display = 'none';
             document.getElementById('resultsContainer').innerHTML = `
                 <div class="loading-container">
                     <div class="spinner"></div>
@@ -694,7 +724,8 @@
                 // Marcar workers como completados con la distribución real
                 setAllWorkersCompleted(state.allResults.length);
 
-                // Mostrar resultados
+                // Mostrar resultados y activar filtros
+                showPostSearchFilters(state.allResults);
                 displayResults(true);
 
             } catch (error) {
@@ -771,26 +802,53 @@
             }
         }
 
+        const SOURCE_COLORS = {
+            'YouTube':'#ff0000','GitHub':'#24292e','GitLab':'#fc6d26',
+            'Reddit':'#ff4500','Stack Overflow':'#f48024','Super User':'#2d9ee0','Ask Ubuntu':'#e95420',
+            'Wikipedia':'#000000','Hacker News':'#ff6600','npm':'#cb3837',
+            'DEV.to':'#0a0a0a','Archive.org':'#1a1a6c','Open Library':'#4a90d9',
+            'Google Books':'#4285f4','MediaFire':'#1fb3e2','arXiv':'#b31b1b',
+            'Quora':'#b92b27','Vimeo':'#1ab7ea','Medium':'#000000',
+            'Google Drive':'#0f9d58','Google Docs':'#4285f4','Towards Data Science':'#000000',
+            'DuckDuckGo':'#de5833','Bing':'#008272'
+        };
+        const SOURCE_ICONS = {
+            'YouTube':'▶️','GitHub':'🐙','GitLab':'🦊','Reddit':'🤖','Stack Overflow':'❓',
+            'Super User':'💻','Ask Ubuntu':'🐧','Wikipedia':'📖','Hacker News':'🔥',
+            'npm':'📦','DEV.to':'📝','Archive.org':'🗄️','Open Library':'📚',
+            'Google Books':'📖','MediaFire':'☁️','arXiv':'📊','Quora':'🗣️',
+            'Vimeo':'🎬','Medium':'✍️','Google Drive':'📁','Google Docs':'📄'
+        };
+
         function createResultCard(result) {
             const card = document.createElement('div');
             card.className = 'result-card';
-            const relevance = result.relevance ?? 0;
+            const rel   = result.relevance ?? 0;
+            const src   = result.source || 'Web';
+            const color = SOURCE_COLORS[src] || '#667eea';
+            const icon  = SOURCE_ICONS[src] || '🌐';
+            const domain = (() => { try { return new URL(result.url).hostname.replace('www.',''); } catch { return ''; } })();
+
+            card.style.borderLeftColor = color;
             card.innerHTML = `
-                <span class="result-source">${escapeHtml(result.source || 'Web')}</span>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                    <span class="result-source" style="background:${color}">${icon} ${escapeHtml(src)}</span>
+                    <span style="font-size:0.75em;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">${escapeHtml(domain)}</span>
+                </div>
                 <h3 class="result-title">${escapeHtml(result.title)}</h3>
                 <p class="result-description">${escapeHtml(result.description || '')}</p>
                 <div class="result-meta">
                     <div class="relevance-score">
                         <span>Relevancia:</span>
                         <div class="score-bar">
-                            <div class="score-fill" style="width: ${relevance}%"></div>
+                            <div class="score-fill" style="width:${rel}%;background:${rel>70?'#28a745':rel>40?'#ffc107':'#dc3545'}"></div>
                         </div>
-                        <span>${Math.round(relevance)}%</span>
+                        <span style="font-weight:700;color:${rel>70?'#28a745':rel>40?'#ffc107':'#dc3545'}">${Math.round(rel)}%</span>
                     </div>
                 </div>
                 <a href="${result.url}" class="result-link" target="_blank" rel="noopener noreferrer"
-                   onclick="event.stopPropagation()">
-                    🔗 Visitar enlace →
+                   style="border-color:${color};color:${color}" onclick="event.stopPropagation()">
+                    🔗 Abrir →
                 </a>
             `;
             card.addEventListener('click', () => showPreview(result));
@@ -888,6 +946,43 @@
             const div = document.createElement('div');
             div.textContent = String(text || '');
             return div.innerHTML;
+        }
+
+        // ── Filtro inline post-búsqueda ─────────────────────────
+        function showPostSearchFilters(results) {
+            const panel = document.getElementById('postSearchFilters');
+            if (!panel) return;
+            panel.style.display = 'block';
+
+            // Poblar select de fuentes
+            const sources = [...new Set(results.map(r => r.source || 'Web'))].sort();
+            const sel = document.getElementById('sourceFilter');
+            sel.innerHTML = '<option value="">Todas las fuentes</option>' +
+                sources.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)} (${results.filter(r=>(r.source||'Web')===s).length})</option>`).join('');
+
+            document.getElementById('resultCount').textContent = `${results.length} resultados`;
+        }
+
+        function filterResultsInline(text) {
+            const src  = document.getElementById('sourceFilter')?.value || '';
+            applyInlineFilter(text, src);
+        }
+
+        function filterBySource(src) {
+            const txt = document.getElementById('resultFilter')?.value || '';
+            applyInlineFilter(txt, src);
+        }
+
+        function applyInlineFilter(text, source) {
+            const lc = text.toLowerCase();
+            state.filteredResults = state.allResults.filter(r => {
+                const matchText   = !lc || r.title.toLowerCase().includes(lc) || (r.description||'').toLowerCase().includes(lc) || r.url.toLowerCase().includes(lc);
+                const matchSource = !source || (r.source||'Web') === source;
+                return matchText && matchSource;
+            });
+            state.filteredResults = sortResults(state.filteredResults, state.currentSort);
+            document.getElementById('resultCount').textContent = `${state.filteredResults.length} de ${state.allResults.length}`;
+            displayResults(true);
         }
     </script>
 </body>
