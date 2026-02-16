@@ -3,8 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscador Avanzado v4.0</title>
+    <title>NEXUS AI Search — Next Generation Search Engine</title>
     <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --dark-2: #1e293b;
+            --dark-3: #334155;
+            --light: #f8fafc;
+            --light-2: #e2e8f0;
+            --text: #0f172a;
+            --text-light: #64748b;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-lg: rgba(0, 0, 0, 0.2);
+            --glow: rgba(99, 102, 241, 0.3);
+        }
+
+        [data-theme="dark"] {
+            --dark: #f8fafc;
+            --dark-2: #e2e8f0;
+            --dark-3: #cbd5e1;
+            --light: #0f172a;
+            --light-2: #1e293b;
+            --text: #f8fafc;
+            --text-light: #94a3b8;
+            --shadow: rgba(255, 255, 255, 0.05);
+            --shadow-lg: rgba(255, 255, 255, 0.1);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,978 +44,936 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--light);
+            color: var(--text);
+            transition: all 0.3s ease;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* ANIMATED BACKGROUND */
+        /* ═══════════════════════════════════════════════════════════════ */
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1em;
-        }
-
-        .search-section {
-            padding: 30px;
-            background: #f8f9fa;
-            border-bottom: 3px solid #e9ecef;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #495057;
-            font-size: 0.95em;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #dee2e6;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .filter-section {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .filter-chip {
-            padding: 10px 20px;
-            border: 2px solid #dee2e6;
-            border-radius: 25px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-            user-select: none;
-        }
-
-        .filter-chip:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .filter-chip.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .search-button {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .search-button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .search-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .workers-status {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            flex-wrap: wrap;
-        }
-
-        .worker-indicator {
-            flex: 1;
-            min-width: 100px;
-            max-width: 160px;
-            padding: 10px 12px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            text-align: center;
-            border-left: 4px solid #dee2e6;
-            transition: all 0.3s;
-        }
-
-        .worker-indicator.active {
-            background: #d4edda;
-            border-left-color: #28a745;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .worker-indicator .worker-name {
-            font-weight: 600;
-            color: #495057;
-            font-size: 0.78em;
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .worker-indicator .worker-status {
-            font-size: 0.75em;
-            color: #6c757d;
-        }
-
-        .stats-bar {
-            display: flex;
-            justify-content: space-around;
-            padding: 20px;
-            background: #e9ecef;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 15px;
-            background: white;
-            border-radius: 10px;
-            min-width: 150px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .stat-value {
-            font-size: 2em;
-            font-weight: 700;
-            color: #667eea;
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 0.85em;
-            color: #6c757d;
-            margin-top: 5px;
-        }
-
-        .results-section {
-            padding: 30px;
-        }
-
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .sort-controls {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .sort-button {
-            padding: 10px 20px;
-            border: 2px solid #dee2e6;
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .sort-button:hover {
-            border-color: #667eea;
-            color: #667eea;
-        }
-
-        .sort-button.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
-        }
-
-        .result-card {
-            background: white;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            padding: 20px;
-            transition: all 0.3s;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .result-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            border-color: #667eea;
-        }
-
-        .result-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 5px;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .result-source {
-            display: inline-block;
-            padding: 5px 12px;
-            background: #667eea;
-            color: white;
-            border-radius: 15px;
-            font-size: 0.75em;
-            font-weight: 600;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-        }
-
-        .result-title {
-            font-size: 1.2em;
-            font-weight: 700;
-            color: #212529;
-            margin-bottom: 10px;
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .result-description {
-            color: #6c757d;
-            font-size: 0.9em;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .result-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            font-size: 0.85em;
-            color: #6c757d;
-        }
-
-        .relevance-score {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .score-bar {
-            width: 60px;
-            height: 6px;
-            background: #e9ecef;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .score-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #28a745, #ffc107, #dc3545);
-            transition: width 0.3s;
-        }
-
-        .result-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            background: #f8f9fa;
-            color: #667eea;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9em;
-            transition: all 0.3s;
-        }
-
-        .result-link:hover {
-            background: #667eea;
-            color: white;
-            transform: translateX(5px);
-        }
-
-        .loading-container {
-            text-align: center;
-            padding: 40px;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 60px 20px;
-            color: #6c757d;
-        }
-
-        .no-results-icon {
-            font-size: 4em;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-
-        .error-message {
-            text-align: center;
-            padding: 40px;
-            background: #fff3f3;
-            border: 2px solid #dc3545;
-            border-radius: 12px;
-            color: #dc3545;
-            margin: 20px 0;
-        }
-
-        .error-message .error-icon {
-            font-size: 3em;
-            margin-bottom: 15px;
-        }
-
-        .load-more-trigger {
-            height: 100px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #6c757d;
-            font-style: italic;
-        }
-
-        .preview-modal {
-            display: none;
+        .animated-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            z-index: -1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            opacity: 0.05;
+        }
+
+        [data-theme="dark"] .animated-bg {
+            opacity: 0.1;
+        }
+
+        .bg-orbs {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            opacity: 0.1;
+            animation: float 20s infinite ease-in-out;
+            filter: blur(60px);
+        }
+
+        .orb:nth-child(1) {
+            width: 400px;
+            height: 400px;
+            top: -200px;
+            left: -200px;
+            animation-delay: 0s;
+        }
+
+        .orb:nth-child(2) {
+            width: 500px;
+            height: 500px;
+            top: 50%;
+            right: -250px;
+            animation-delay: 7s;
+        }
+
+        .orb:nth-child(3) {
+            width: 300px;
+            height: 300px;
+            bottom: -150px;
+            left: 30%;
+            animation-delay: 14s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(50px, -50px) scale(1.1);
+            }
+            66% {
+                transform: translate(-50px, 50px) scale(0.9);
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* NAVBAR */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--light-2);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
             z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            box-shadow: 0 4px 20px var(--shadow);
         }
 
-        .preview-modal.active {
+        [data-theme="dark"] .navbar {
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom-color: var(--dark-3);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
             display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .preview-content {
-            background: white;
-            border-radius: 15px;
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            filter: drop-shadow(0 0 10px var(--glow));
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle {
+            background: var(--light-2);
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* HERO SECTION */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem 2rem;
             max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 30px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 20px var(--glow);
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 4px 20px var(--glow);
+            }
+            50% {
+                box-shadow: 0 8px 30px var(--glow);
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* SEARCH BOX */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .search-container {
+            max-width: 700px;
+            margin: 0 auto 3rem;
             position: relative;
         }
 
-        .preview-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 40px;
-            height: 40px;
-            border: none;
-            background: #dc3545;
-            color: white;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s;
+        .search-box {
+            display: flex;
+            background: white;
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px var(--shadow-lg);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        .preview-close:hover {
-            transform: rotate(90deg);
-            background: #c82333;
+        [data-theme="dark"] .search-box {
+            background: var(--dark-2);
         }
+
+        .search-box:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 10px 40px var(--glow);
+            transform: translateY(-2px);
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 1.2rem 2rem;
+            font-size: 1.1rem;
+            background: transparent;
+            color: var(--text);
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            padding: 0 2.5rem;
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .search-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        .search-btn:active {
+            transform: scale(0.98);
+        }
+
+        .search-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Autocomplete Suggestions */
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 16px;
+            margin-top: 0.5rem;
+            box-shadow: 0 10px 40px var(--shadow-lg);
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 100;
+        }
+
+        [data-theme="dark"] .suggestions {
+            background: var(--dark-2);
+        }
+
+        .suggestions.active {
+            display: block;
+        }
+
+        .suggestion-item {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid var(--light-2);
+        }
+
+        .suggestion-item:hover {
+            background: var(--light-2);
+        }
+
+        .suggestion-icon {
+            font-size: 1.2rem;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* STATS BAR */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+            padding: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px var(--shadow);
+            min-width: 150px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .stat-card {
+            background: var(--dark-2);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px var(--shadow-lg);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* RESULTS */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .results-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .results-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .results-info {
+            font-size: 0.95rem;
+            color: var(--text-light);
+        }
+
+        .sort-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .sort-btn {
+            padding: 0.5rem 1rem;
+            background: var(--light-2);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .sort-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .sort-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary);
+            cursor: pointer;
+        }
+
+        [data-theme="dark"] .result-card {
+            background: var(--dark-2);
+        }
+
+        .result-card:hover {
+            transform: translateX(8px);
+            box-shadow: 0 8px 30px var(--shadow-lg);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .result-source {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .result-description {
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .result-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .neural-score {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--light-2);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .score-bar {
+            width: 80px;
+            height: 6px;
+            background: var(--light-2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.3s ease;
+        }
+
+        .result-url {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .result-url:hover {
+            text-decoration: underline;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* LOADING */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            border: 4px solid var(--light-2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* EMPTY STATE */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* RESPONSIVE */
+        /* ═══════════════════════════════════════════════════════════════ */
 
         @media (max-width: 768px) {
-            .results-grid { grid-template-columns: 1fr; }
-            .header h1 { font-size: 1.8em; }
-            .workers-status { flex-direction: column; }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+                border-radius: 16px;
+            }
+
+            .search-btn {
+                padding: 1rem;
+                justify-content: center;
+            }
+
+            .results-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* ANIMATIONS */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🔍 Buscador Avanzado v4.0</h1>
-            <p>20 workers · 17 fuentes · DDG · Bing · Wikipedia · YouTube · GitHub · GitLab · Reddit · StackOverflow · HackerNews · arXiv · Books · npm · DEV.to · Archive · Quora · Vimeo</p>
-        </div>
+<body data-theme="light">
+    <!-- Animated Background -->
+    <div class="bg-orbs">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+    <div class="animated-bg"></div>
 
-        <div class="search-section">
-            <div class="input-group">
-                <label for="keyword">🎯 Palabra Clave</label>
-                <input type="text" id="keyword" placeholder="Ingresa tu palabra clave (ej: arroz, python, tutorial)">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🧠</span>
+                <span>NEXUS</span>
             </div>
-
-            <div class="input-group">
-                <label>🎛️ Filtros de Sitio</label>
-                <div class="filter-section">
-                    <div class="filter-chip" data-filter="all">Todos los sitios</div>
-                    <div class="filter-chip" data-filter="youtube">YouTube</div>
-                    <div class="filter-chip" data-filter="mediafire">MediaFire</div>
-                    <div class="filter-chip" data-filter="google">Google Drive</div>
-                    <div class="filter-chip" data-filter="github">GitHub</div>
-                    <div class="filter-chip" data-filter="reddit">Reddit</div>
-                    <div class="filter-chip" data-filter="stackoverflow">Stack Overflow</div>
-                    <div class="filter-chip" data-filter="medium">Medium</div>
-                </div>
-            </div>
-
-            <button class="search-button" id="searchBtn">🚀 Iniciar Búsqueda</button>
-
-            <div class="workers-status" id="workersStatus"></div>
-        </div>
-
-        <div class="stats-bar" id="statsBar" style="display: none;">
-            <div class="stat-item">
-                <span class="stat-value" id="totalResults">0</span>
-                <span class="stat-label">Resultados Encontrados</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-value" id="filteredResults">0</span>
-                <span class="stat-label">Después del Filtrado</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-value" id="searchTime">0s</span>
-                <span class="stat-label">Tiempo de Búsqueda</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-value" id="activeWorkers">0</span>
-                <span class="stat-label">Workers Activos</span>
+            <div class="nav-controls">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                    <span id="themeIcon">🌙</span>
+                </button>
             </div>
         </div>
+    </nav>
 
-        <div class="results-section">
-            <div class="results-header" id="resultsHeader" style="display: none;">
-                <h2>📊 Resultados</h2>
-                <div class="sort-controls">
-                    <button class="sort-button active" data-sort="relevance">Por Relevancia</button>
-                    <button class="sort-button" data-sort="alphabetical">Alfabético</button>
-                    <button class="sort-button" data-sort="source">Por Fuente</button>
-                </div>
-            </div>
-            <div id="postSearchFilters" style="display:none;padding:15px 0;display:none;">
-                <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-                    <span style="font-weight:600;color:#495057">🎯 Filtrar resultados:</span>
-                    <input type="text" id="resultFilter" placeholder="Buscar dentro de los resultados..." 
-                        style="flex:1;min-width:200px;padding:8px 14px;border:2px solid #dee2e6;border-radius:8px;font-size:14px"
-                        oninput="filterResultsInline(this.value)">
-                    <select id="sourceFilter" onchange="filterBySource(this.value)"
-                        style="padding:8px 14px;border:2px solid #dee2e6;border-radius:8px;font-size:14px;background:white">
-                        <option value="">Todas las fuentes</option>
-                    </select>
-                    <span id="resultCount" style="font-size:0.85em;color:#6c757d;white-space:nowrap"></span>
-                </div>
-            </div>
-            <div id="resultsContainer"></div>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="ai-badge">
+            <span>⚡</span>
+            <span>Powered by Neural AI</span>
+        </div>
+        <h1>La Búsqueda del Futuro</h1>
+        <p>Motor de búsqueda con inteligencia artificial que aprende de ti</p>
+    </section>
+
+    <!-- Search Container -->
+    <div class="search-container">
+        <div class="search-box">
+            <input 
+                type="text" 
+                class="search-input" 
+                id="searchInput" 
+                placeholder="¿Qué quieres encontrar hoy?"
+                autocomplete="off"
+            >
+            <button class="search-btn" id="searchBtn">
+                <span>Buscar</span>
+                <span>🚀</span>
+            </button>
+        </div>
+        <div class="suggestions" id="suggestions"></div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar" id="statsBar" style="display: none;">
+        <div class="stat-card">
+            <div class="stat-value" id="statResults">0</div>
+            <div class="stat-label">Resultados</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="statTime">0s</div>
+            <div class="stat-label">Tiempo</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="statAI">🧠</div>
+            <div class="stat-label">AI Activa</div>
         </div>
     </div>
 
-    <div class="preview-modal" id="previewModal">
-        <div class="preview-content" id="previewContent">
-            <button class="preview-close" id="previewClose">×</button>
-            <div id="previewBody"></div>
-        </div>
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="loader"></div>
+        <p>Analizando con IA neuronal...</p>
+    </div>
+
+    <!-- Results -->
+    <div class="results-container" id="resultsContainer">
+        <!-- Results will be inserted here -->
     </div>
 
     <script>
-        // ==================== CONFIGURACIÓN ====================
-        const CONFIG = {
-            WORKERS_COUNT: 20,
-            RESULTS_PER_PAGE: 100,
-            MIN_TITLE_LENGTH: 5,
-            MAX_TITLE_LENGTH: 200,
-            BACKEND_URL: 'https://backendbuscador.onrender.com'
+        // ═══════════════════════════════════════════════════════════════════
+        // STATE
+        // ═══════════════════════════════════════════════════════════════════
+
+        const state = {
+            theme: localStorage.getItem('theme') || 'light',
+            results: [],
+            currentQuery: '',
+            isSearching: false
         };
 
-        // ==================== ESTADO GLOBAL ====================
-        let state = {
-            allResults: [],
-            filteredResults: [],
-            displayedResults: 0,
-            currentSort: 'relevance',
-            selectedFilter: 'all',
-            isSearching: false,
-            workers: [],
-            startTime: null
-        };
+        // ═══════════════════════════════════════════════════════════════════
+        // THEME
+        // ═══════════════════════════════════════════════════════════════════
 
-        // ==================== INICIALIZACIÓN ====================
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeWorkers();
-            initializeEventListeners();
+        function setTheme(theme) {
+            state.theme = theme;
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            document.getElementById('themeIcon').textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            setTheme(state.theme === 'dark' ? 'light' : 'dark');
         });
 
-        // ==================== WORKERS (UI) ====================
-        const WORKER_NAMES = [
-            '🦆 DuckDuckGo p1','🦆 DuckDuckGo p2','🦆 DDG exacto','🦆 DDG descarga',
-            '🔷 Bing p1','🔷 Bing p2','🔷 Bing p3',
-            '📖 Wikipedia','▶️ YouTube','🐙 GitHub',
-            '🤖 Reddit','❓ StackOverflow','🔥 HackerNews',
-            '📚 Books','🗄️ Archive.org','📝 DEV.to',
-            '📦 npm','📊 arXiv','🗣️ Quora','🎬 Vimeo'
-        ];
+        setTheme(state.theme);
 
-        function initializeWorkers() {
-            const workersContainer = document.getElementById('workersStatus');
-            workersContainer.innerHTML = '';
-            state.workers = [];
+        // ═══════════════════════════════════════════════════════════════════
+        // SEARCH
+        // ═══════════════════════════════════════════════════════════════════
 
-            for (let i = 0; i < CONFIG.WORKERS_COUNT; i++) {
-                const name = WORKER_NAMES[i] || `Worker #${i + 1}`;
-                const worker = { id: i + 1, name, status: 'idle', resultsFound: 0 };
-                state.workers.push(worker);
+        async function search() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query || state.isSearching) return;
 
-                const workerEl = document.createElement('div');
-                workerEl.className = 'worker-indicator';
-                workerEl.id = `worker-${worker.id}`;
-                workerEl.innerHTML = `
-                    <div class="worker-name">${name}</div>
-                    <div class="worker-status">Inactivo</div>
-                `;
-                workersContainer.appendChild(workerEl);
-            }
-        }
-
-        function setAllWorkersActive() {
-            state.workers.forEach(w => updateWorkerStatus(w.id, 'active'));
-        }
-
-        function setAllWorkersCompleted(totalResults) {
-            const perWorker = Math.ceil(totalResults / CONFIG.WORKERS_COUNT);
-            state.workers.forEach(w => updateWorkerStatus(w.id, 'completed', perWorker));
-        }
-
-        function setAllWorkersIdle() {
-            state.workers.forEach(w => updateWorkerStatus(w.id, 'idle'));
-        }
-
-        function updateWorkerStatus(workerId, status, resultsFound = 0) {
-            const worker = state.workers.find(w => w.id === workerId);
-            if (worker) {
-                worker.status = status;
-                worker.resultsFound = resultsFound;
-
-                const workerEl = document.getElementById(`worker-${workerId}`);
-                if (workerEl) {
-                    const statusText = status === 'active'    ? '⏳ Buscando...' :
-                                       status === 'completed' ? `✅ ${resultsFound}` :
-                                                                '⬜ Inactivo';
-                    workerEl.querySelector('.worker-status').textContent = statusText;
-                    workerEl.classList.toggle('active', status === 'active');
-                    workerEl.style.borderLeftColor = status==='completed' ? '#28a745' : status==='active' ? '#667eea' : '#dee2e6';
-                }
-            }
-            updateActiveWorkersCount();
-        }
-
-        function updateActiveWorkersCount() {
-            const activeCount = state.workers.filter(w => w.status === 'active').length;
-            document.getElementById('activeWorkers').textContent = activeCount;
-        }
-
-        // ==================== BÚSQUEDA REAL AL BACKEND ====================
-        async function performSearch(keyword, filter) {
             state.isSearching = true;
-            state.allResults = [];
-            state.filteredResults = [];
-            state.displayedResults = 0;
-            state.startTime = Date.now();
+            state.currentQuery = query;
 
+            // UI Updates
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('resultsContainer').innerHTML = '';
+            document.getElementById('statsBar').style.display = 'none';
             document.getElementById('searchBtn').disabled = true;
-            document.getElementById('statsBar').style.display = 'flex';
-            document.getElementById('resultsHeader').style.display = 'none';
-            const psf = document.getElementById('postSearchFilters');
-            if (psf) psf.style.display = 'none';
-            document.getElementById('resultsContainer').innerHTML = `
-                <div class="loading-container">
-                    <div class="spinner"></div>
-                    <p>Buscando con ${CONFIG.WORKERS_COUNT} workers paralelos en el servidor...</p>
-                </div>
-            `;
-
-            // Activar visualmente todos los workers mientras espera la respuesta del backend
-            setAllWorkersActive();
 
             try {
-                const response = await fetch(`${CONFIG.BACKEND_URL}/api/search`, {
+                const response = await fetch('/api/search', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ keyword: keyword.trim(), filter })
+                    body: JSON.stringify({ keyword: query })
                 });
 
-                // Leer como texto primero para evitar crash si el servidor devuelve HTML
-                const rawText = await response.text();
-                let data;
-                try {
-                    data = JSON.parse(rawText);
-                } catch (e) {
-                    const preview = rawText.substring(0, 120).replace(/</g, '&lt;');
-                    throw new Error(
-                        `El servidor no devolvió JSON válido (status ${response.status}). ` +
-                        `Respuesta: ${preview}`
-                    );
+                const data = await response.json();
+
+                if (data.success) {
+                    state.results = data.results;
+                    displayResults(data.results);
+                    updateStats(data.stats);
+                } else {
+                    showError('Error en la búsqueda');
                 }
-
-                if (!response.ok) {
-                    throw new Error(data.error || `Error del servidor: ${response.status}`);
-                }
-
-                if (!data.success) {
-                    throw new Error(data.error || 'El servidor devolvió un error');
-                }
-
-                // Guardar resultados reales del backend
-                state.allResults = data.results || [];
-                state.filteredResults = sortResults(state.allResults, state.currentSort);
-
-                const searchTime = data.stats?.searchTime || ((Date.now() - state.startTime) / 1000).toFixed(2);
-
-                // Actualizar estadísticas con datos reales
-                document.getElementById('totalResults').textContent = data.stats?.totalResults ?? state.allResults.length;
-                document.getElementById('filteredResults').textContent = state.filteredResults.length;
-                document.getElementById('searchTime').textContent = searchTime + 's';
-
-                // Marcar workers como completados con la distribución real
-                setAllWorkersCompleted(state.allResults.length);
-
-                // Mostrar resultados y activar filtros
-                showPostSearchFilters(state.allResults);
-                displayResults(true);
-
             } catch (error) {
-                console.error('Error al contactar el backend:', error);
-                document.getElementById('resultsContainer').innerHTML = `
-                    <div class="error-message">
-                        <div class="error-icon">⚠️</div>
-                        <h3>No se pudo conectar con el backend</h3>
-                        <p>${escapeHtml(error.message)}</p>
-                        <p style="margin-top:10px; font-size:0.85em; color:#888;">
-                            Verifica que el servidor esté corriendo
-                        </p>
-                    </div>
-                `;
-                document.getElementById('totalResults').textContent = '0';
-                document.getElementById('filteredResults').textContent = '0';
-                document.getElementById('searchTime').textContent = '—';
-                setAllWorkersIdle();
+                console.error('Search error:', error);
+                showError('Error de conexión');
             } finally {
                 state.isSearching = false;
+                document.getElementById('loading').classList.remove('active');
                 document.getElementById('searchBtn').disabled = false;
-
-                setTimeout(() => setAllWorkersIdle(), 2000);
             }
         }
 
-        // ==================== RENDERIZADO ====================
-        function displayResults(reset = false) {
-            if (reset) {
-                state.displayedResults = 0;
-                document.getElementById('resultsContainer').innerHTML = '';
-                document.getElementById('resultsHeader').style.display = 'flex';
-            }
-
+        function displayResults(results) {
             const container = document.getElementById('resultsContainer');
-            const start = state.displayedResults;
-            const end = Math.min(start + CONFIG.RESULTS_PER_PAGE, state.filteredResults.length);
 
-            if (start === 0 && end === 0) {
+            if (!results.length) {
                 container.innerHTML = `
-                    <div class="no-results">
-                        <div class="no-results-icon">🔍</div>
+                    <div class="empty-state fade-in">
+                        <div class="empty-icon">🔍</div>
                         <h3>No se encontraron resultados</h3>
-                        <p>Intenta con otra palabra clave o cambia los filtros</p>
+                        <p>Intenta con otros términos de búsqueda</p>
                     </div>
                 `;
                 return;
             }
 
-            const resultsGrid = reset
-                ? (() => { const d = document.createElement('div'); d.className = 'results-grid'; return d; })()
-                : (container.querySelector('.results-grid') || (() => { const d = document.createElement('div'); d.className = 'results-grid'; return d; })());
-
-            for (let i = start; i < end; i++) {
-                resultsGrid.appendChild(createResultCard(state.filteredResults[i]));
-            }
-
-            if (reset) container.appendChild(resultsGrid);
-
-            state.displayedResults = end;
-
-            // Infinite scroll trigger
-            const existingTrigger = container.querySelector('.load-more-trigger');
-            if (end < state.filteredResults.length) {
-                if (!existingTrigger) {
-                    const trigger = document.createElement('div');
-                    trigger.className = 'load-more-trigger';
-                    trigger.textContent = 'Cargando más resultados...';
-                    container.appendChild(trigger);
-                    observeLoadMore(trigger);
-                }
-            } else if (existingTrigger) {
-                existingTrigger.remove();
-            }
-        }
-
-        const SOURCE_COLORS = {
-            'YouTube':'#ff0000','GitHub':'#24292e','GitLab':'#fc6d26',
-            'Reddit':'#ff4500','Stack Overflow':'#f48024','Super User':'#2d9ee0','Ask Ubuntu':'#e95420',
-            'Wikipedia':'#000000','Hacker News':'#ff6600','npm':'#cb3837',
-            'DEV.to':'#0a0a0a','Archive.org':'#1a1a6c','Open Library':'#4a90d9',
-            'Google Books':'#4285f4','MediaFire':'#1fb3e2','arXiv':'#b31b1b',
-            'Quora':'#b92b27','Vimeo':'#1ab7ea','Medium':'#000000',
-            'Google Drive':'#0f9d58','Google Docs':'#4285f4','Towards Data Science':'#000000',
-            'DuckDuckGo':'#de5833','Bing':'#008272'
-        };
-        const SOURCE_ICONS = {
-            'YouTube':'▶️','GitHub':'🐙','GitLab':'🦊','Reddit':'🤖','Stack Overflow':'❓',
-            'Super User':'💻','Ask Ubuntu':'🐧','Wikipedia':'📖','Hacker News':'🔥',
-            'npm':'📦','DEV.to':'📝','Archive.org':'🗄️','Open Library':'📚',
-            'Google Books':'📖','MediaFire':'☁️','arXiv':'📊','Quora':'🗣️',
-            'Vimeo':'🎬','Medium':'✍️','Google Drive':'📁','Google Docs':'📄'
-        };
-
-        function createResultCard(result) {
-            const card = document.createElement('div');
-            card.className = 'result-card';
-            const rel   = result.relevance ?? 0;
-            const src   = result.source || 'Web';
-            const color = SOURCE_COLORS[src] || '#667eea';
-            const icon  = SOURCE_ICONS[src] || '🌐';
-            const domain = (() => { try { return new URL(result.url).hostname.replace('www.',''); } catch { return ''; } })();
-
-            card.style.borderLeftColor = color;
-            card.innerHTML = `
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-                    <span class="result-source" style="background:${color}">${icon} ${escapeHtml(src)}</span>
-                    <span style="font-size:0.75em;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">${escapeHtml(domain)}</span>
-                </div>
-                <h3 class="result-title">${escapeHtml(result.title)}</h3>
-                <p class="result-description">${escapeHtml(result.description || '')}</p>
-                <div class="result-meta">
-                    <div class="relevance-score">
-                        <span>Relevancia:</span>
-                        <div class="score-bar">
-                            <div class="score-fill" style="width:${rel}%;background:${rel>70?'#28a745':rel>40?'#ffc107':'#dc3545'}"></div>
-                        </div>
-                        <span style="font-weight:700;color:${rel>70?'#28a745':rel>40?'#ffc107':'#dc3545'}">${Math.round(rel)}%</span>
+            const header = `
+                <div class="results-header fade-in">
+                    <div class="results-info">
+                        Mostrando ${results.length} resultados para "<strong>${state.currentQuery}</strong>"
+                    </div>
+                    <div class="sort-buttons">
+                        <button class="sort-btn active" onclick="sortResults('neural')">🧠 IA</button>
+                        <button class="sort-btn" onclick="sortResults('alpha')">🔤 A-Z</button>
                     </div>
                 </div>
-                <a href="${result.url}" class="result-link" target="_blank" rel="noopener noreferrer"
-                   style="border-color:${color};color:${color}" onclick="event.stopPropagation()">
-                    🔗 Abrir →
-                </a>
             `;
-            card.addEventListener('click', () => showPreview(result));
-            return card;
+
+            const cards = results.map((result, i) => {
+                const score = result.neuralScore || result.relevance || 50;
+                return `
+                    <div class="result-card fade-in" style="animation-delay: ${i * 0.05}s" onclick="handleResultClick('${result.url}')">
+                        <div class="result-header">
+                            <span class="result-source">${escapeHtml(result.source || 'Web')}</span>
+                        </div>
+                        <h3 class="result-title">${escapeHtml(result.title)}</h3>
+                        <p class="result-description">${escapeHtml(result.description || '')}</p>
+                        <div class="result-meta">
+                            <div class="neural-score">
+                                <span>🧠</span>
+                                <div class="score-bar">
+                                    <div class="score-fill" style="width: ${score}%"></div>
+                                </div>
+                                <span>${Math.round(score)}%</span>
+                            </div>
+                            <a href="${result.url}" class="result-url" target="_blank" rel="noopener" onclick="event.stopPropagation()">
+                                Abrir <span>→</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = header + cards;
         }
 
-        function showPreview(result) {
-            const modal = document.getElementById('previewModal');
-            const body = document.getElementById('previewBody');
-            body.innerHTML = `
-                <h2>${escapeHtml(result.title)}</h2>
-                <p><strong>Fuente:</strong> ${escapeHtml(result.source || 'Web')}</p>
-                <p><strong>Relevancia:</strong> ${Math.round(result.relevance ?? 0)}%</p>
-                <p><strong>URL:</strong> <a href="${result.url}" target="_blank" rel="noopener noreferrer">${escapeHtml(result.url)}</a></p>
-                <hr style="margin: 20px 0; border: none; border-top: 2px solid #e9ecef;">
-                <p>${escapeHtml(result.description || '')}</p>
-                <br>
-                <a href="${result.url}" class="result-link" target="_blank" rel="noopener noreferrer"
-                   style="display: inline-flex;">
-                    🔗 Abrir en nueva pestaña →
-                </a>
-            `;
-            modal.classList.add('active');
+        function updateStats(stats) {
+            document.getElementById('statsBar').style.display = 'flex';
+            document.getElementById('statResults').textContent = stats.totalResults;
+            document.getElementById('statTime').textContent = `${stats.searchTime}s`;
+            document.getElementById('statAI').textContent = stats.aiRanked ? '✓' : '✗';
         }
 
-        // ==================== ORDENAMIENTO ====================
-        function sortResults(results, sortType) {
-            const sorted = [...results];
-            switch (sortType) {
-                case 'relevance':    sorted.sort((a, b) => (b.relevance ?? 0) - (a.relevance ?? 0)); break;
-                case 'alphabetical': sorted.sort((a, b) => a.title.localeCompare(b.title)); break;
-                case 'source':       sorted.sort((a, b) => (a.source || '').localeCompare(b.source || '')); break;
+        function showError(message) {
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = `
+                <div class="empty-state fade-in">
+                    <div class="empty-icon">⚠️</div>
+                    <h3>${message}</h3>
+                </div>
+            `;
+        }
+
+        function handleResultClick(url) {
+            // Learn from click
+            if (state.currentQuery) {
+                fetch('/api/learn', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        query: state.currentQuery,
+                        url: url
+                    })
+                }).catch(() => {});
             }
-            return sorted;
+            window.open(url, '_blank');
         }
 
-        // ==================== EVENTOS ====================
-        function initializeEventListeners() {
-            // Filtros
-            document.querySelectorAll('.filter-chip').forEach(chip => {
-                chip.addEventListener('click', () => {
-                    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-                    chip.classList.add('active');
-                    state.selectedFilter = chip.dataset.filter;
-                });
-            });
-            document.querySelector('.filter-chip[data-filter="all"]').classList.add('active');
+        function sortResults(type) {
+            const sorted = [...state.results];
 
-            // Botón buscar
-            document.getElementById('searchBtn').addEventListener('click', () => {
-                const keyword = document.getElementById('keyword').value.trim();
-                if (!keyword) { alert('Por favor ingresa una palabra clave'); return; }
-                performSearch(keyword, state.selectedFilter);
-            });
+            if (type === 'neural') {
+                sorted.sort((a, b) => (b.neuralScore || b.relevance || 0) - (a.neuralScore || a.relevance || 0));
+            } else if (type === 'alpha') {
+                sorted.sort((a, b) => a.title.localeCompare(b.title));
+            }
 
-            // Enter
-            document.getElementById('keyword').addEventListener('keypress', e => {
-                if (e.key === 'Enter') document.getElementById('searchBtn').click();
-            });
+            state.results = sorted;
+            displayResults(sorted);
 
-            // Ordenamiento
-            document.querySelectorAll('.sort-button').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.sort-button').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    state.currentSort = btn.dataset.sort;
-                    state.filteredResults = sortResults(state.allResults, state.currentSort);
-                    displayResults(true);
-                });
-            });
-
-            // Modal
-            document.getElementById('previewClose').addEventListener('click', () => {
-                document.getElementById('previewModal').classList.remove('active');
-            });
-            document.getElementById('previewModal').addEventListener('click', e => {
-                if (e.target.id === 'previewModal') {
-                    document.getElementById('previewModal').classList.remove('active');
-                }
-            });
+            // Update active button
+            document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
         }
 
-        // ==================== INFINITE SCROLL ====================
-        function observeLoadMore(element) {
-            const observer = new IntersectionObserver(entries => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting && !state.isSearching) displayResults(false);
-                });
-            }, { threshold: 0.1 });
-            observer.observe(element);
-        }
-
-        // ==================== UTILIDADES ====================
         function escapeHtml(text) {
             const div = document.createElement('div');
-            div.textContent = String(text || '');
+            div.textContent = text || '';
             return div.innerHTML;
         }
 
-        // ── Filtro inline post-búsqueda ─────────────────────────
-        function showPostSearchFilters(results) {
-            const panel = document.getElementById('postSearchFilters');
-            if (!panel) return;
-            panel.style.display = 'block';
+        // ═══════════════════════════════════════════════════════════════════
+        // AUTOCOMPLETE
+        // ═══════════════════════════════════════════════════════════════════
 
-            // Poblar select de fuentes
-            const sources = [...new Set(results.map(r => r.source || 'Web'))].sort();
-            const sel = document.getElementById('sourceFilter');
-            sel.innerHTML = '<option value="">Todas las fuentes</option>' +
-                sources.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)} (${results.filter(r=>(r.source||'Web')===s).length})</option>`).join('');
+        let suggestionTimeout;
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            clearTimeout(suggestionTimeout);
+            const query = e.target.value.trim();
 
-            document.getElementById('resultCount').textContent = `${results.length} resultados`;
+            if (query.length < 2) {
+                document.getElementById('suggestions').classList.remove('active');
+                return;
+            }
+
+            suggestionTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch(`/api/suggest?q=${encodeURIComponent(query)}`);
+                    const data = await response.json();
+
+                    if (data.suggestions && data.suggestions.length) {
+                        showSuggestions(data.suggestions);
+                    }
+                } catch (error) {
+                    console.error('Suggestions error:', error);
+                }
+            }, 300);
+        });
+
+        function showSuggestions(suggestions) {
+            const container = document.getElementById('suggestions');
+            const html = suggestions.map(s => `
+                <div class="suggestion-item" onclick="applySuggestion('${escapeHtml(s.text)}')">
+                    <span class="suggestion-icon">🔍</span>
+                    <span>${escapeHtml(s.text)}</span>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+            container.classList.add('active');
         }
 
-        function filterResultsInline(text) {
-            const src  = document.getElementById('sourceFilter')?.value || '';
-            applyInlineFilter(text, src);
+        function applySuggestion(text) {
+            document.getElementById('searchInput').value = text;
+            document.getElementById('suggestions').classList.remove('active');
+            search();
         }
 
-        function filterBySource(src) {
-            const txt = document.getElementById('resultFilter')?.value || '';
-            applyInlineFilter(txt, src);
-        }
+        // Close suggestions on outside click
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-container')) {
+                document.getElementById('suggestions').classList.remove('active');
+            }
+        });
 
-        function applyInlineFilter(text, source) {
-            const lc = text.toLowerCase();
-            state.filteredResults = state.allResults.filter(r => {
-                const matchText   = !lc || r.title.toLowerCase().includes(lc) || (r.description||'').toLowerCase().includes(lc) || r.url.toLowerCase().includes(lc);
-                const matchSource = !source || (r.source||'Web') === source;
-                return matchText && matchSource;
-            });
-            state.filteredResults = sortResults(state.filteredResults, state.currentSort);
-            document.getElementById('resultCount').textContent = `${state.filteredResults.length} de ${state.allResults.length}`;
-            displayResults(true);
-        }
+        // ═══════════════════════════════════════════════════════════════════
+        // EVENT LISTENERS
+        // ═══════════════════════════════════════════════════════════════════
+
+        document.getElementById('searchBtn').addEventListener('click', search);
+
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') search();
+        });
+
+        // ═══════════════════════════════════════════════════════════════════
+        // INIT
+        // ═══════════════════════════════════════════════════════════════════
+
+        console.log('%c🧠 NEXUS AI Search v6.0', 'font-size: 20px; font-weight: bold; color: #6366f1;');
+        console.log('%cPowered by Neural Intelligence', 'font-size: 14px; color: #8b5cf6;');
     </script>
 </body>
 </html>
