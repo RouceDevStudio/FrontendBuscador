@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscador Avanzado - Multi-Worker</title>
+    <title>Buscador Avanzado v3.0 - 18 Workers</title>
     <style>
         * {
             margin: 0;
@@ -479,7 +479,7 @@
     <div class="container">
         <div class="header">
             <h1>🔍 Buscador Avanzado Multi-Worker</h1>
-            <p>Búsqueda inteligente con 12 workers especializados: DuckDuckGo · Bing · Wikipedia · YouTube · GitHub · Reddit · StackOverflow · HackerNews · Archive.org · OpenLibrary</p>
+            <p>Búsqueda inteligente con 18 workers paralelos: DDG×4 · Bing×3 · Wikipedia · YouTube · GitHub · Reddit · StackOverflow · HackerNews · Archive.org · Books · DEV.to · npm</p>
         </div>
 
         <div class="search-section">
@@ -549,7 +549,7 @@
     <script>
         // ==================== CONFIGURACIÓN ====================
         const CONFIG = {
-            WORKERS_COUNT: 12,
+            WORKERS_COUNT: 18,
             RESULTS_PER_PAGE: 100,
             MIN_TITLE_LENGTH: 5,
             MAX_TITLE_LENGTH: 200,
